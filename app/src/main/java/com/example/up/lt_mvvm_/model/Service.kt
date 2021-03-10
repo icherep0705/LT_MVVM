@@ -15,6 +15,7 @@ private const val timeoutRead = 30
 private const val contentType = "Content-Type"
 private const val contentTypeValue = "application/json"
 private const val timeoutConnect = 30
+private const val BASE_URL = "TODO"
 
 @Singleton
 class Service @Inject constructor() {
@@ -48,7 +49,7 @@ class Service @Inject constructor() {
         okHttpBuilder.readTimeout(timeoutRead.toLong(), TimeUnit.SECONDS)
         val client = okHttpBuilder.build()
         retrofit = Retrofit.Builder()
-                .baseUrl("BASE_URL").client(client)
+                .baseUrl(BASE_URL).client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
     }
