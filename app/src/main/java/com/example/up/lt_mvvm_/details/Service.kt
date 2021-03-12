@@ -1,4 +1,4 @@
-package com.example.up.lt_mvvm_.model
+package com.example.up.lt_mvvm_.details
 
 import com.example.up.lt_mvvm_.BuildConfig
 import okhttp3.Interceptor

@@ -1,6 +1,8 @@
-package com.example.up.lt_mvvm_.view
+package com.example.up.lt_mvvm_.details
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,12 +13,21 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.up.lt_mvvm_.R
+import com.example.up.lt_mvvm_.data.Currencies
 import com.example.up.lt_mvvm_.databinding.FragmentListBinding
+import com.example.up.lt_mvvm_.home.HomeFragment.Companion.ARG_CURRENCY
 
 
 class ListFragment : Fragment() {
 
     private var binding: FragmentListBinding? = null
+    private lateinit var currency: String
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val currency = arguments?.getString(ARG_CURRENCY) ?: Currencies.USD.name
+        Log.d(TAG, currency)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,5 +69,9 @@ class ListFragment : Fragment() {
         super.onDestroy()
         binding?.unbind()
         binding = null
+    }
+
+    companion object {
+        private val TAG = ListFragment::class.java.simpleName
     }
 }

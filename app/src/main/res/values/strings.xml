@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">LT_MVVM_</string>
+    <string name="us_dollar">US Dollar</string>
+    <string name="euro">Euro</string>
+    <string name="great_britain_pound">Great Britain Pound</string>
+    <string name="japanese_yen">Japanese Yen</string>
 </resources>
