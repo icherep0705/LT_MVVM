@@ -58,4 +58,8 @@ class Service @Inject constructor() {
         return retrofit.create(serviceClass)
     }
 
+
+
+    //API link - https://exchangeratesapi.io/10:42
+    //API link - https://exchangeratesapi.io/
 }
