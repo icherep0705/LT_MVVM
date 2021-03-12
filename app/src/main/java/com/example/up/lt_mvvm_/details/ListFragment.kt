@@ -1,6 +1,5 @@
 package com.example.up.lt_mvvm_.details
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,6 +8,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,11 +22,13 @@ class ListFragment : Fragment() {
 
     private var binding: FragmentListBinding? = null
     private lateinit var currency: String
+    private val viewModel: ListFragmentViewModel by viewModels { ListFragmentViewModelFactory(currency) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val currency = arguments?.getString(ARG_CURRENCY) ?: Currencies.USD.name
+        currency = arguments?.getString(ARG_CURRENCY) ?: Currencies.USD.name
         Log.d(TAG, currency)
+        viewModel.doSomething()
     }
 
     override fun onCreateView(
