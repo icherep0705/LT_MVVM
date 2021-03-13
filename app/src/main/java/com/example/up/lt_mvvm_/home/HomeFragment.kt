@@ -36,7 +36,7 @@ class HomeFragment : Fragment() {
                 Navigation.findNavController(it).navigate(R.id.action_homeFragment_to_listFragment, bundle)
             }
             euro.setOnClickListener{
-                val bundle = bundleOf(ARG_CURRENCY to Currencies.EU.name)
+                val bundle = bundleOf(ARG_CURRENCY to Currencies.EUR.name)
                 Navigation.findNavController(it).navigate(R.id.action_homeFragment_to_listFragment, bundle)
             }
             pound.setOnClickListener{

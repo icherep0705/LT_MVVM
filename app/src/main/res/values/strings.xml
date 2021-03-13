@@ -4,4 +4,6 @@
     <string name="euro">Euro</string>
     <string name="great_britain_pound">Great Britain Pound</string>
     <string name="japanese_yen">Japanese Yen</string>
+    <string name="last_updated">Last Updated:</string>
+    <string name="base_currency">Base currency</string>
 </resources>

@@ -28,7 +28,6 @@ class ListFragment : Fragment() {
         super.onCreate(savedInstanceState)
         currency = arguments?.getString(ARG_CURRENCY) ?: Currencies.USD.name
         Log.d(TAG, currency)
-        viewModel.doSomething()
     }
 
     override fun onCreateView(
@@ -41,21 +40,13 @@ class ListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setAdapter()
+        initListeners()
     }
 
-    private fun setAdapter() {
+    private fun setAdapter(data: Map<String, Double>) {
         context?.let {
             binding?.apply {
                 container.layoutManager = LinearLayoutManager(it)
-                val data = mutableListOf<String>().also {
-                    it.add("One")
-                    it.add("Two")
-                    it.add("Three")
-                    it.add("Four")
-                    it.add("Five")
-                    it.add("Six")
-                }
                 container.adapter = ListFragmentAdapter(data)
 
                 val itemDecorator = DividerItemDecoration(it, RecyclerView.VERTICAL)
@@ -65,6 +56,29 @@ class ListFragment : Fragment() {
                 container.addItemDecoration(itemDecorator)
             }
         }
+    }
+
+    private fun initListeners() {
+        binding?.progressBarLayout?.progressBar?.visibility = View.VISIBLE
+        viewModel.getLiveRates().observe(viewLifecycleOwner, { result ->
+            result.fold(
+                onSuccess = { rates ->
+                    binding?.apply {
+                        time.text = rates.date
+                        base.text = rates.base
+                        rates.rates?.let { setAdapter(it) }
+                        progressBarLayout.progressBar.visibility = View.GONE
+                        timeLabel.visibility = View.VISIBLE
+                        baseLabel.visibility = View.VISIBLE
+                    }
+                },
+
+                onFailure = {
+                    Log.d(TAG, it.message.toString())
+                    binding?.progressBarLayout?.progressBar?.visibility = View.GONE
+                }
+            )
+        })
     }
 
     override fun onDestroy() {

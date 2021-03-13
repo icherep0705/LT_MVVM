@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.up.lt_mvvm_.R
 import com.example.up.lt_mvvm_.databinding.ListItemBinding
 
-class ListFragmentAdapter(private val data: List<String>): RecyclerView.Adapter<ListFragmentAdapter.ListVH>() {
+class ListFragmentAdapter(private val data: Map<String, Double>): RecyclerView.Adapter<ListFragmentAdapter.ListVH>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListVH {
         val binding: ListItemBinding = DataBindingUtil
@@ -16,15 +16,17 @@ class ListFragmentAdapter(private val data: List<String>): RecyclerView.Adapter<
     }
 
     override fun onBindViewHolder(holder: ListVH, position: Int) {
-        holder.bind(data[position])
+        data.keys.toList()[position]
+        holder.bind(data.keys.toList()[position], data[data.keys.toList()[position]])
     }
 
     override fun getItemCount() = data.size
 
     class ListVH(private val binding: ListItemBinding): RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(s: String) {
-            binding.label1.text = s
+        fun bind(currency: String?, value: Double?) {
+            binding.label1.text = currency
+            binding.label2.text = value?.toString()
         }
     }
 }
