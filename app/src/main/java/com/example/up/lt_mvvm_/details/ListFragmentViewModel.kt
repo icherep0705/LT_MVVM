@@ -73,7 +73,7 @@ class ListFragmentViewModel(
 
         viewModelScope.launch {
             val liveRates = serverRepo.getRatesDB(ctx, currency)
-            liveRates.observeForever{ result: Result<List<ExchangeRate>?> ->
+            liveRates.observeForever{ result ->
                 result.fold(
                         onSuccess = { rates ->
 
