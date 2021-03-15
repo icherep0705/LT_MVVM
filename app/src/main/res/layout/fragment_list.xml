@@ -10,10 +10,26 @@
 
 
         <TextView
-            android:layout_marginTop="24dp"
-            android:visibility="gone"
+            android:layout_marginTop="12dp"
             android:layout_marginStart="12dp"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:id="@+id/status"
+            android:textSize="14sp"
+            android:text="@string/live"
+            android:visibility="gone"
+            app:drawableStartCompat="@drawable/online_indicator"
+            app:drawableEndCompat="@drawable/online_indicator" />
+
+        <TextView
+            android:layout_marginTop="12dp"
+            android:visibility="gone"
+            android:layout_marginStart="12dp"
+            app:layout_constraintTop_toBottomOf="@+id/status"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -22,9 +38,9 @@
             android:text="@string/last_updated"/>
 
         <TextView
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="12dp"
             android:layout_marginEnd="12dp"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/status"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

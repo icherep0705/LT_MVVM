@@ -1,4 +1,4 @@
-package com.example.up.lt_mvvm_.data
+package com.example.up.lt_mvvm_.data.server
 
 import com.example.up.lt_mvvm_.BuildConfig
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory

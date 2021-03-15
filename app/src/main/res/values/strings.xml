@@ -6,4 +6,6 @@
     <string name="japanese_yen">Japanese Yen</string>
     <string name="last_updated">Last Updated:</string>
     <string name="base_currency">Base currency</string>
+    <string name="live">" Live "</string>
+    <string name="offline">" Offline "</string>
 </resources>
