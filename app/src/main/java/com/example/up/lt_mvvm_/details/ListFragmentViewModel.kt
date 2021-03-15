@@ -2,6 +2,7 @@ package com.example.up.lt_mvvm_.details
 
 import android.content.Context
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
@@ -28,18 +29,36 @@ class ListFragmentViewModel(private val currency: String): ViewModel() {
             })
     }
 
-    fun getDBRates(ctx: Context) = liveData(viewModelScope.coroutineContext) {
-            emit(
-                kotlin.runCatching {
-                  //  CurrencyDatabase.getInstance(ctx)?.exchangeRateDao()?.getAll(currency)
-                })
+//    fun getDBRates(ctx: Context) = liveData(viewModelScope.coroutineContext) {
+//            emit(
+//                kotlin.runCatching {
+//                  //  CurrencyDatabase.getInstance(ctx)?.exchangeRateDao()?.getAll(currency)
+//                })
+//
+//    }
 
-    }
-
-    fun saveRates(ctx: Context, currency: ExchangeRate) {
+    fun saveRatesDB(ctx: Context, currency: ExchangeRate) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 CurrencyDatabase.getInstance(ctx)?.exchangeRateDao()?.insertCurrency(currency)
+            }
+        }
+    }
+
+    fun getRatesDB(ctx: Context) = liveData(viewModelScope.coroutineContext) {
+        withContext(Dispatchers.IO) {
+            emit(
+                    kotlin.runCatching {
+                        CurrencyDatabase.getInstance(ctx)?.exchangeRateDao()?.getAll(currency)
+                    })
+
+        }
+    }
+
+    fun deleteRatesDB(ctx: Context) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                CurrencyDatabase.getInstance(ctx)?.exchangeRateDao()?.deleteAll(currency)
             }
         }
     }

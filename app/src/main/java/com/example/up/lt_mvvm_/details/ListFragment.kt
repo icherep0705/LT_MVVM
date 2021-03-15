@@ -15,8 +15,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.up.lt_mvvm_.R
 import com.example.up.lt_mvvm_.Utils
 import com.example.up.lt_mvvm_.data.Currencies
-import com.example.up.lt_mvvm_.data.db.CurrencyDB
-import com.example.up.lt_mvvm_.data.db.CurrencyDatabase
 import com.example.up.lt_mvvm_.data.db.ExchangeRate
 import com.example.up.lt_mvvm_.databinding.FragmentListBinding
 import com.example.up.lt_mvvm_.home.HomeFragment.Companion.ARG_CURRENCY
@@ -36,8 +34,8 @@ class ListFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
 
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_list, container, false)
@@ -70,39 +68,42 @@ class ListFragment : Fragment() {
         if (isConnected) {
             viewModel.getLiveRates().observe(viewLifecycleOwner, { result ->
                 result.fold(
-                    onSuccess = { rates ->
-                        binding?.apply {
-                            time.text = rates.date
-                            base.text = rates.base
-                            rates.rates?.let { setAdapter(it) }
-                            progressBarLayout.progressBar.visibility = View.GONE
-                            timeLabel.visibility = View.VISIBLE
-                            baseLabel.visibility = View.VISIBLE
-                            status.visibility = View.VISIBLE
+                        onSuccess = { rates ->
+                            binding?.apply {
+                                time.text = rates.date
+                                base.text = rates.base
+                                rates.rates?.let { setAdapter(it) }
+                                progressBarLayout.progressBar.visibility = View.GONE
+                                timeLabel.visibility = View.VISIBLE
+                                baseLabel.visibility = View.VISIBLE
+                                status.visibility = View.VISIBLE
 
-                            context?.apply {
-                                rates.rates?.keys?.forEach{
-                                    val exchangeRate = ExchangeRate(
-                                        baseCurrency = rates.base,
-                                        timeStamp = rates.date,
-                                        currency = it,
-                                        exchangeRate = rates.rates[it] ?: 0.0
-                                    )
-                                    viewModel.saveRates(this, exchangeRate)
+
+                                context?.apply {
+                                    viewModel.deleteRatesDB(this)
+                                    rates.rates?.keys?.forEach{
+                                        val exchangeRate = ExchangeRate(
+                                                baseCurrency = rates.base,
+                                                timeStamp = rates.date,
+                                                currency = it,
+                                                exchangeRate = rates.rates[it] ?: 0.0
+                                        )
+
+                                        viewModel.saveRatesDB(this, exchangeRate)
+                                    }
                                 }
                             }
-                        }
-                    },
+                        },
 
-                    onFailure = {
-                        Log.d(TAG, it.message.toString())
-                        binding?.apply {
-                            progressBarLayout.progressBar.visibility = View.GONE
-                            status.setCompoundDrawablesWithIntrinsicBounds(R.drawable.offline_indicator, 0,  R.drawable.offline_indicator, 0)
-                            status.visibility = View.VISIBLE
-                        }
+                        onFailure = {
+                            Log.d(TAG, it.message.toString())
 
-                    }
+                            binding?.apply {
+                                progressBarLayout.progressBar.visibility = View.GONE
+                                status.setCompoundDrawablesWithIntrinsicBounds(R.drawable.offline_indicator, 0, R.drawable.offline_indicator, 0)
+                                status.visibility = View.VISIBLE
+                            }
+                        }
                 )
             })
         } else {
@@ -112,29 +113,40 @@ class ListFragment : Fragment() {
                 status.text = resources.getText(R.string.offline)
 
                 context?.let {
-                    viewModel.getDBRates(it).observe(viewLifecycleOwner, { result ->
+                    viewModel.getRatesDB(it).observe(viewLifecycleOwner, { result ->
                         result.fold(
-                            onSuccess = { rates ->
-                                binding?.apply {
-//                                    time.text = rates.date
-//                                    base.text = rates.base
-//                                    rates.rates?.let { setAdapter(it) }
-                                    progressBarLayout.progressBar.visibility = View.GONE
-                                    timeLabel.visibility = View.VISIBLE
-                                    baseLabel.visibility = View.VISIBLE
-                                    status.visibility = View.VISIBLE
-                                }
-                            },
+                                onSuccess = { rates ->
+                                    binding?.apply {
+                                        progressBarLayout.progressBar.visibility = View.GONE
+                                        rates?.let {
+                                            if (rates.isNotEmpty()) {
+                                                time.text = rates[0].timeStamp
+                                                base.text = rates[0].baseCurrency
 
-                            onFailure = {
-                                Log.d(TAG, it.message.toString())
-                                binding?.apply {
-                                    progressBarLayout.progressBar.visibility = View.GONE
-                                    status.setCompoundDrawablesWithIntrinsicBounds(R.drawable.offline_indicator, 0,  R.drawable.offline_indicator, 0)
-                                    status.visibility = View.VISIBLE
-                                }
+                                                val data: MutableMap<String, Double> = mutableMapOf()
+                                                rates.forEach {
+                                                    data[it.currency] = it.exchangeRate
+                                                }
+                                                setAdapter(data)
+                                                timeLabel.visibility = View.VISIBLE
+                                                baseLabel.visibility = View.VISIBLE
+                                                status.visibility = View.VISIBLE
+                                            } else {
+                                               noDataMsg.visibility = View.VISIBLE
+                                            }
+                                        }
+                                    }
+                                },
 
-                            }
+                                onFailure = {
+                                    Log.d(TAG, it.message.toString())
+                                    binding?.apply {
+                                        progressBarLayout.progressBar.visibility = View.GONE
+                                        status.setCompoundDrawablesWithIntrinsicBounds(R.drawable.offline_indicator, 0,  R.drawable.offline_indicator, 0)
+                                        status.visibility = View.VISIBLE
+                                    }
+
+                                }
                         )
                     })
                 }
