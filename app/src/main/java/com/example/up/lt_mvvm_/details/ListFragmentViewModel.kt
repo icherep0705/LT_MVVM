@@ -1,18 +1,18 @@
 package com.example.up.lt_mvvm_.details
 
+import android.app.Application
 import android.content.Context
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.up.lt_mvvm_.data.ApiClient
-import com.example.up.lt_mvvm_.data.db.CurrencyDatabase
+import com.example.up.lt_mvvm_.data.Currency
 import com.example.up.lt_mvvm_.data.db.ExchangeRate
-import com.example.up.lt_mvvm_.data.server.Client
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlin.collections.MutableMap
+import kotlin.collections.forEach
+import kotlin.collections.isNotEmpty
+import kotlin.collections.mutableMapOf
+import kotlin.collections.set
 
 class ListFragmentViewModel(private val currency: String): ViewModel() {
 
