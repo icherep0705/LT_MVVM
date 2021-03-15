@@ -9,7 +9,7 @@ enum class Currencies {
 
 @Parcelize
 data class Currency(
-    val rates: Map<String, Double>?,
-    val base: String,
-    val date: String
+        var rates: Map<String, Double>?,
+        var base: String,
+        var date: String
 ) : Parcelable

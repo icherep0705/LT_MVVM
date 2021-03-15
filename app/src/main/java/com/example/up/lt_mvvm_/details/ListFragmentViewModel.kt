@@ -14,51 +14,93 @@ import kotlin.collections.isNotEmpty
 import kotlin.collections.mutableMapOf
 import kotlin.collections.set
 
-class ListFragmentViewModel(private val currency: String): ViewModel() {
+class ListFragmentViewModel(private val currency: String, private val isConnected: Boolean, application: Application): AndroidViewModel(application) {
+
+    private val serverRepo = Repository() // TODO: 3/15/21 inject
+    val currencyLiveData : MutableLiveData<Currency> by lazy {  MutableLiveData<Currency>() }
+    val errorLiveData : MutableLiveData<String> by lazy {  MutableLiveData<String>() }
+    private val ctx: Application = application
 
     init {
-        Log.d(TAG, "ViewModel: $currency")
+        if (isConnected) {
+            getLiveRates()
+        } else {
+            getRatesDB(ctx)
+        }
     }
 
-    private val service = Client().createClient(ApiClient::class.java)
-
-    fun getLiveRates() = liveData(viewModelScope.coroutineContext) {
-        emit(
-            kotlin.runCatching {
-                service.getRates(currency).await()
-            })
-    }
-
-//    fun getDBRates(ctx: Context) = liveData(viewModelScope.coroutineContext) {
-//            emit(
-//                kotlin.runCatching {
-//                  //  CurrencyDatabase.getInstance(ctx)?.exchangeRateDao()?.getAll(currency)
-//                })
-//
-//    }
-
-    fun saveRatesDB(ctx: Context, currency: ExchangeRate) {
+    private fun getLiveRates(){
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                CurrencyDatabase.getInstance(ctx)?.exchangeRateDao()?.insertCurrency(currency)
+            val liveRates = serverRepo.getLiveRates(currency)
+            liveRates.observeForever{ result ->
+                result.fold(
+                        onSuccess = {
+                            currencyLiveData.postValue(it)
+                            deleteRatesDB()
+
+                            it.rates?.keys?.forEach{ s ->
+                                val currency = ExchangeRate(
+                                        baseCurrency = it.base,
+                                        timeStamp = it.date,
+                                        currency = s,
+                                        exchangeRate = it.rates?.get(s) ?: 0.0
+                                )
+                                saveRatesDB(currency)
+                            }
+                        },
+
+                        onFailure = {
+                            errorLiveData.postValue("No Data Available")
+                        }
+                )
             }
         }
     }
 
-    fun getRatesDB(ctx: Context) = liveData(viewModelScope.coroutineContext) {
-        withContext(Dispatchers.IO) {
-            emit(
-                    kotlin.runCatching {
-                        CurrencyDatabase.getInstance(ctx)?.exchangeRateDao()?.getAll(currency)
-                    })
-
+    private fun saveRatesDB(currency: ExchangeRate) {
+        viewModelScope.launch {
+            serverRepo.saveRatesDB(ctx, currency)
         }
     }
 
-    fun deleteRatesDB(ctx: Context) {
+    private fun deleteRatesDB() {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                CurrencyDatabase.getInstance(ctx)?.exchangeRateDao()?.deleteAll(currency)
+            serverRepo.deleteRatesDB(ctx, currency)
+        }
+    }
+
+    private fun getRatesDB(ctx: Context) {
+
+        viewModelScope.launch {
+            val liveRates = serverRepo.getRatesDB(ctx, currency)
+            liveRates.observeForever{ result ->
+                result.fold(
+                        onSuccess = { rates ->
+
+                            rates?.let {
+                                if (rates.isNotEmpty()) {
+
+                                    val data: MutableMap<String, Double> = mutableMapOf()
+                                    rates.forEach {
+                                        data[it.currency] = it.exchangeRate
+                                    }
+                                    val exchangeRate = Currency(
+                                            date = rates[0].timeStamp,
+                                            base = rates[0].baseCurrency,
+                                            rates = data
+                                    )
+                                    currencyLiveData.postValue(exchangeRate)
+
+                                } else {
+                                    errorLiveData.postValue("No Data Available")
+                                }
+                            }
+                        },
+
+                        onFailure = {
+                            errorLiveData.postValue("No Data Available")
+                        }
+                )
             }
         }
     }

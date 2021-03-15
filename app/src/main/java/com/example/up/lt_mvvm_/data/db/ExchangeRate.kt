@@ -21,6 +21,3 @@ data class ExchangeRate(
     @ColumnInfo(name = "time_stamp")
     var timeStamp: String = ""
 )
-{
-    constructor() : this(1,"","",0.0,"")
-}
