@@ -15,15 +15,26 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.up.lt_mvvm_.R
 import com.example.up.lt_mvvm_.Utils
 import com.example.up.lt_mvvm_.data.Currencies
+import com.example.up.lt_mvvm_.data.server.Client
 import com.example.up.lt_mvvm_.databinding.FragmentListBinding
 import com.example.up.lt_mvvm_.home.HomeFragment.Companion.ARG_CURRENCY
+import dagger.hilt.android.scopes.FragmentScoped
 
+@FragmentScoped
 class ListFragment : Fragment() {
 
+    //    @Inject lateinit var repo: Repository
+    private val repo: Repository by lazy { Repository(Client())}
     private var binding: FragmentListBinding? = null
     private lateinit var currency: String
     private var isConnected: Boolean = false
-    private val viewModel: ListFragmentViewModel by viewModels { ListFragmentViewModelFactory(currency, isConnected, activity?.application!!) }
+    private val viewModel: ListFragmentViewModel by viewModels {
+        ListFragmentViewModelFactory(
+                currency,
+                isConnected,
+                activity?.application!!,
+                repo
+        ) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,7 +97,6 @@ class ListFragment : Fragment() {
             binding?.noDataMsg?.visibility = View.VISIBLE
             binding?.progressBarLayout?.progressBar?.visibility = View.GONE
         })
-
     }
 
     override fun onDestroy() {

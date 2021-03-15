@@ -8,15 +8,15 @@ import androidx.lifecycle.viewModelScope
 import com.example.up.lt_mvvm_.data.Currency
 import com.example.up.lt_mvvm_.data.db.ExchangeRate
 import kotlinx.coroutines.launch
-import kotlin.collections.MutableMap
-import kotlin.collections.forEach
-import kotlin.collections.isNotEmpty
-import kotlin.collections.mutableMapOf
 import kotlin.collections.set
 
-class ListFragmentViewModel(private val currency: String, private val isConnected: Boolean, application: Application): AndroidViewModel(application) {
+class ListFragmentViewModel(
+        private val currency: String,
+        private val isConnected: Boolean,
+        application: Application,
+        private  val serverRepo: Repository
+): AndroidViewModel(application) {
 
-    private val serverRepo = Repository() // TODO: 3/15/21 inject
     val currencyLiveData : MutableLiveData<Currency> by lazy {  MutableLiveData<Currency>() }
     val errorLiveData : MutableLiveData<String> by lazy {  MutableLiveData<String>() }
     private val ctx: Application = application
@@ -73,7 +73,7 @@ class ListFragmentViewModel(private val currency: String, private val isConnecte
 
         viewModelScope.launch {
             val liveRates = serverRepo.getRatesDB(ctx, currency)
-            liveRates.observeForever{ result ->
+            liveRates.observeForever{ result: Result<List<ExchangeRate>?> ->
                 result.fold(
                         onSuccess = { rates ->
 

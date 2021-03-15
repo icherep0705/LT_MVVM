@@ -8,10 +8,11 @@ import com.example.up.lt_mvvm_.data.db.ExchangeRate
 import com.example.up.lt_mvvm_.data.server.Client
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class Repository {
+class Repository @Inject constructor(client: Client) {
 
-    private val service = Client().createClient(ApiClient::class.java)
+     private val service = client.createClient(ApiClient::class.java)
 
     suspend fun getLiveRates(base: String) = liveData(Dispatchers.IO) {
         emit(
