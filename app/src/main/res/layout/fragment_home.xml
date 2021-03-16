@@ -11,25 +11,37 @@
         android:gravity="center"
         android:padding="24dp">
 
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/input"
+            android:inputType="number"
+            android:hint="Enter an amount"/>
+
         <Button
+            android:enabled="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/us_dollar"
             android:id="@+id/dollar"/>
 
         <Button
+            android:enabled="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/euro"
             android:id="@+id/euro"/>
 
         <Button
+            android:enabled="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/great_britain_pound"
             android:id="@+id/pound"/>
 
         <Button
+            android:enabled="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/japanese_yen"

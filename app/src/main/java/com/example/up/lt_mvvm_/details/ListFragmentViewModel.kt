@@ -8,13 +8,16 @@ import androidx.lifecycle.viewModelScope
 import com.example.up.lt_mvvm_.data.Currency
 import com.example.up.lt_mvvm_.data.db.ExchangeRate
 import kotlinx.coroutines.launch
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.collections.set
 
 class ListFragmentViewModel(
-        private val currency: String,
-        private val isConnected: Boolean,
-        application: Application,
-        private  val serverRepo: Repository
+    private val currency: String,
+    private val isConnected: Boolean,
+    application: Application,
+    private val serverRepo: Repository
 ): AndroidViewModel(application) {
 
     val currencyLiveData : MutableLiveData<Currency> by lazy {  MutableLiveData<Currency>() }
@@ -34,24 +37,27 @@ class ListFragmentViewModel(
             val liveRates = serverRepo.getLiveRates(currency)
             liveRates.observeForever{ result ->
                 result.fold(
-                        onSuccess = {
-                            currencyLiveData.postValue(it)
-                            deleteRatesDB()
+                    onSuccess = {
+                        val df: DateFormat = SimpleDateFormat("EEE, d MMM yyyy, HH:mm")
+                        val date: String = df.format(Calendar.getInstance().time)
+                        it.date = date
+                        currencyLiveData.postValue(it)
+                        deleteRatesDB()
 
-                            it.rates?.keys?.forEach{ s ->
-                                val currency = ExchangeRate(
-                                        baseCurrency = it.base,
-                                        timeStamp = it.date,
-                                        currency = s,
-                                        exchangeRate = it.rates?.get(s) ?: 0.0
-                                )
-                                saveRatesDB(currency)
-                            }
-                        },
-
-                        onFailure = {
-                            errorLiveData.postValue("No Data Available")
+                        it.rates?.keys?.forEach { s ->
+                            val currency = ExchangeRate(
+                                baseCurrency = it.base,
+                                timeStamp = it.date,
+                                currency = s,
+                                exchangeRate = it.rates?.get(s) ?: 0.0
+                            )
+                            saveRatesDB(currency)
                         }
+                    },
+
+                    onFailure = {
+                        errorLiveData.postValue("No Data Available")
+                    }
                 )
             }
         }
@@ -75,31 +81,31 @@ class ListFragmentViewModel(
             val liveRates = serverRepo.getRatesDB(ctx, currency)
             liveRates.observeForever{ result ->
                 result.fold(
-                        onSuccess = { rates ->
+                    onSuccess = { rates ->
 
-                            rates?.let {
-                                if (rates.isNotEmpty()) {
+                        rates?.let {
+                            if (rates.isNotEmpty()) {
 
-                                    val data: MutableMap<String, Double> = mutableMapOf()
-                                    rates.forEach {
-                                        data[it.currency] = it.exchangeRate
-                                    }
-                                    val exchangeRate = Currency(
-                                            date = rates[0].timeStamp,
-                                            base = rates[0].baseCurrency,
-                                            rates = data
-                                    )
-                                    currencyLiveData.postValue(exchangeRate)
-
-                                } else {
-                                    errorLiveData.postValue("No Data Available")
+                                val data: MutableMap<String, Double> = mutableMapOf()
+                                rates.forEach {
+                                    data[it.currency] = it.exchangeRate
                                 }
-                            }
-                        },
+                                val exchangeRate = Currency(
+                                    date = rates[0].timeStamp,
+                                    base = rates[0].baseCurrency,
+                                    rates = data
+                                )
+                                currencyLiveData.postValue(exchangeRate)
 
-                        onFailure = {
-                            errorLiveData.postValue("No Data Available")
+                            } else {
+                                errorLiveData.postValue("No Data Available")
+                            }
                         }
+                    },
+
+                    onFailure = {
+                        errorLiveData.postValue("No Data Available")
+                    }
                 )
             }
         }

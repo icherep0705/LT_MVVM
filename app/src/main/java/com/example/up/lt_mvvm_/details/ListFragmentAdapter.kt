@@ -7,12 +7,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.up.lt_mvvm_.R
 import com.example.up.lt_mvvm_.databinding.ListItemBinding
 
-class ListFragmentAdapter(private val data: Map<String, Double>): RecyclerView.Adapter<ListFragmentAdapter.ListVH>() {
+class ListFragmentAdapter(
+    private val data: Map<String, Double>,
+    private val amount: Int
+): RecyclerView.Adapter<ListFragmentAdapter.ListVH>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListVH {
         val binding: ListItemBinding = DataBindingUtil
             .inflate(LayoutInflater.from(parent.context), R.layout.list_item, parent, false)
-        return ListVH(binding)
+        return ListVH(binding, amount)
     }
 
     override fun onBindViewHolder(holder: ListVH, position: Int) {
@@ -22,11 +25,11 @@ class ListFragmentAdapter(private val data: Map<String, Double>): RecyclerView.A
 
     override fun getItemCount() = data.size
 
-    class ListVH(private val binding: ListItemBinding): RecyclerView.ViewHolder(binding.root) {
+    class ListVH(private val binding: ListItemBinding, private val amount: Int): RecyclerView.ViewHolder(binding.root) {
 
         fun bind(currency: String?, value: Double?) {
             binding.label1.text = currency
-            binding.label2.text = value?.toString()
+            value?.let {  binding.label2.text = (it * amount).toString() }
         }
     }
 }

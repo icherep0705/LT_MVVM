@@ -17,6 +17,7 @@ import com.example.up.lt_mvvm_.Utils
 import com.example.up.lt_mvvm_.data.Currencies
 import com.example.up.lt_mvvm_.data.server.Client
 import com.example.up.lt_mvvm_.databinding.FragmentListBinding
+import com.example.up.lt_mvvm_.home.HomeFragment.Companion.ARG_AMOUNT
 import com.example.up.lt_mvvm_.home.HomeFragment.Companion.ARG_CURRENCY
 import dagger.hilt.android.scopes.FragmentScoped
 
@@ -27,6 +28,7 @@ class ListFragment : Fragment() {
     private val repo: Repository by lazy { Repository(Client())}
     private var binding: FragmentListBinding? = null
     private lateinit var currency: String
+    private var amount: Int = 0
     private var isConnected: Boolean = false
     private val viewModel: ListFragmentViewModel by viewModels {
         ListFragmentViewModelFactory(
@@ -38,7 +40,11 @@ class ListFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        currency = arguments?.getString(ARG_CURRENCY) ?: Currencies.USD.name
+        arguments?.apply {
+            currency = getString(ARG_CURRENCY) ?: Currencies.USD.name
+            amount = (getString(ARG_AMOUNT) ?: "0").toInt()
+        }
+
         context?.apply { isConnected = Utils.isNetworkConnected(this)}
         Log.d(TAG, currency)
     }
@@ -68,7 +74,7 @@ class ListFragment : Fragment() {
         context?.let {
             binding?.apply {
                 container.layoutManager = LinearLayoutManager(it)
-                container.adapter = ListFragmentAdapter(data)
+                container.adapter = ListFragmentAdapter(data, amount)
 
                 val itemDecorator = DividerItemDecoration(it, RecyclerView.VERTICAL)
                 ContextCompat.getDrawable(it, R.drawable.divider)?.apply {
@@ -84,7 +90,7 @@ class ListFragment : Fragment() {
         viewModel.currencyLiveData.observe(viewLifecycleOwner, { rates ->
             binding?.apply {
                 time.text = rates.date
-                base.text = rates.base
+                base.text = "${rates.base} / $amount"
                 rates.rates?.let { setAdapter(it) }
                 progressBarLayout.progressBar.visibility = View.GONE
                 timeLabel.visibility = View.VISIBLE

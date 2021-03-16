@@ -4,8 +4,8 @@
     <string name="euro">Euro</string>
     <string name="great_britain_pound">Great Britain Pound</string>
     <string name="japanese_yen">Japanese Yen</string>
-    <string name="last_updated">Last Updated:</string>
-    <string name="base_currency">Base currency</string>
+    <string name="last_updated">Last Updated</string>
+    <string name="base_currency">Base currency /amount</string>
     <string name="live">" Live "</string>
     <string name="offline">" Offline "</string>
     <string name="no_data_available">No Data Available</string>
